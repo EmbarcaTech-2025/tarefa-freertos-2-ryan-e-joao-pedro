@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.12)
 if (DEFINED ENV{FREERTOS_PATH})
   SET(FREERTOS_PATH $ENV{FREERTOS_PATH})
 else()
-  SET(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/FreeRTOS-Kernel)
+  SET(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/include/FreeRTOS-Kernel)
 endif()
 
 message("FreeRTOS Kernel located in ${FREERTOS_PATH}")
@@ -39,15 +39,24 @@ add_executable(embarcatech-tarefa-freertos-2
     main.c
 )
 
+# Linking SSD1306
+target_sources(embarcatech-tarefa-freertos-2 PRIVATE main.c include/ssd1306/ssd1306.c)
+
+# Generate PIO header
+pico_generate_pio_header(embarcatech-tarefa-freertos-2 ${CMAKE_CURRENT_LIST_DIR}/include/ws2818b.pio)
+
 target_include_directories(embarcatech-tarefa-freertos-2 PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
 target_link_libraries(embarcatech-tarefa-freertos-2 
-    pico_stdlib 
-    FreeRTOS-Kernel-Heap4 
+    pico_stdlib
     hardware_i2c
+    hardware_pwm
+    hardware_gpio
+    hardware_pio
+    FreeRTOS-Kernel-Heap4
     )
 
 pico_add_extra_outputs(embarcatech-tarefa-freertos-2)
